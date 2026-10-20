@@ -1,8 +1,9 @@
 """congestion-llm-gating 세션 폴더 적재.
 
 판정 입력 차단은 여기서 한다. 기존 LLM 판정(`agent`), 원시 트랙(`tracks`),
-처리 시간(`cv_elapsed_sec`)은 Segment로 옮기지 않는다 — 도구가 실수로 노출할
-경로 자체를 없애기 위해서다.
+처리 시간(`cv_elapsed_sec`), 규칙 트리거 정보(`trigger`, `trigger_reason`,
+`co_triggered`, `dynamic_thresholds`)는 Segment로 옮기지 않는다 — 도구가 실수로
+노출할 경로 자체를 없애기 위해서다. 에이전트는 관측값만 보고 볼 구간을 스스로 정한다.
 """
 import json
 from dataclasses import dataclass
@@ -27,9 +28,6 @@ class Segment:
     speed_trend: float
     density_slope: float
     level: str
-    trigger: str | None
-    trigger_reason: str | None
-    co_triggered: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -63,9 +61,6 @@ def _to_segment(index: int, row: dict) -> Segment:
         speed_trend=float(a["speed_trend"]),
         density_slope=float(a["density_slope"]),
         level=a["level"],
-        trigger=row.get("trigger"),
-        trigger_reason=row.get("trigger_reason"),
-        co_triggered=tuple(row.get("co_triggered") or ()),
     )
 
 

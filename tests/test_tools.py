@@ -30,13 +30,13 @@ def test_registry_specs():
 
 # --- session_overview ---
 
-def test_overview_trigger_counts_sum(session):
+def test_overview_level_counts_sum(session):
     out = run_tool(session, "session_overview", {})
-    n_trig = sum(1 for s in session.segments if s.trigger)
-    m = re.search(r"트리거 있는 세그먼트 (\d+)개: (.*)", out)
-    assert int(m.group(1)) == n_trig
-    assert sum(int(x) for x in re.findall(r"\b(\d+)\b", m.group(2))) == n_trig
+    m = re.search(r"level\)별 세그먼트: (.*)", out)
+    assert sum(int(x) for x in re.findall(r"\b(\d+)\b", m.group(1))) == len(session.segments)
     assert "세그먼트 30개" in out
+    assert f"최소 {min(s.total for s in session.segments)}" in out
+    assert "평균 속도(avg_speed) 최소 0.30" in out
 
 
 # --- view_segments ---
@@ -53,16 +53,18 @@ def test_view_out_of_range(session):
         run_tool(session, "view_segments", {"start": 0, "end": 45})
 
 
-def test_view_shows_trigger_reason(session):
-    out = run_tool(session, "view_segments", {"start": 20, "end": 20})
-    assert "hotspot(+surge)" in out and "A구역 14명" in out
-
-
 # --- find_segments ---
 
-def test_find_by_trigger(session):
-    out = run_tool(session, "find_segments", {"trigger": "stagnation"})
-    assert "일치 2개" in out and "12, 13" in out
+def test_find_slow_segments(session):
+    out = run_tool(session, "find_segments", {"max_avg_speed": 0.5})
+    assert "일치 3개" in out and "12, 13, 14" in out
+
+
+def test_find_combined_conditions(session):
+    out = run_tool(session, "find_segments", {"level": "low", "min_density_slope": 0.4})
+    expected = [s.index for s in session.segments if s.level == "low" and s.density_slope >= 0.4]
+    assert expected == [25]
+    assert "일치 1개" in out and "세그먼트: 25" in out
 
 
 def test_find_no_match(session):
@@ -71,8 +73,18 @@ def test_find_no_match(session):
 
 
 def test_find_requires_condition(session):
-    with pytest.raises(ToolError):
+    with pytest.raises(ToolError, match="하나 이상"):
         run_tool(session, "find_segments", {})
+
+
+def test_find_rejects_trigger_argument(session):
+    with pytest.raises(ToolError, match="인자"):
+        run_tool(session, "find_segments", {"trigger": "hotspot"})
+
+
+def test_find_rejects_non_numeric_speed(session):
+    with pytest.raises(ToolError, match="숫자"):
+        run_tool(session, "find_segments", {"max_avg_speed": "slow"})
 
 
 # --- zone_trend ---
@@ -103,16 +115,20 @@ def test_bad_argument_name(session):
 
 
 JUDGMENT_WORDS = re.compile(r"\b(normal|caution|anomaly|monitor|alert)\b|LEAK_")
+# 원본 fixture의 트리거 이름과 trigger_reason 문장 조각
+TRIGGER_WORDS = re.compile(r"\b(surge|stagnation|hotspot|conflict)\b|trigger|배 > 1\.4|임계 8\.0|지속")
 
 
 def test_query_outputs_never_contain_judgment(session):
     n = len(session.segments)
     outputs = [run_tool(session, "session_overview", {})]
     outputs += [run_tool(session, "view_segments", {"start": i, "end": min(i + 19, n - 1)}) for i in range(0, n, 20)]
-    outputs += [run_tool(session, "find_segments", {"trigger": t}) for t in ("surge", "stagnation", "hotspot", "conflict")]
+    outputs += [run_tool(session, "find_segments", {"max_avg_speed": 1.0, "min_total": 0})]
     outputs += [run_tool(session, "find_segments", {"level": l}) for l in ("low", "medium", "high")]
     outputs += [run_tool(session, "zone_trend", {"zone": z}) for z in session.zones]
     for out in outputs:
         assert not JUDGMENT_WORDS.search(out), out
+        assert not TRIGGER_WORDS.search(out), out
     for name in ("session_overview", "view_segments", "find_segments", "zone_trend"):
         assert not JUDGMENT_WORDS.search(TOOLS[name].description)
+        assert not TRIGGER_WORDS.search(TOOLS[name].description)

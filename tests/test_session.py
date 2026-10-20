@@ -16,7 +16,8 @@ def test_loads_fixture(session):
 
 def test_segment_has_no_judgment_or_raw_fields():
     names = {f.name for f in dataclasses.fields(Segment)}
-    assert not names & {"agent", "tracks", "cv_elapsed_sec", "assessment", "action", "reasoning"}
+    assert not names & {"agent", "tracks", "cv_elapsed_sec", "assessment", "action", "reasoning",
+                        "trigger", "trigger_reason", "co_triggered", "dynamic_thresholds"}
 
 
 def test_missing_file(tmp_path):
@@ -38,4 +39,3 @@ def test_broken_line_reports_line_number(tmp_path):
 def test_real_session():
     s = load_session(REAL_SESSION)
     assert len(s.segments) == 400
-    assert sum(1 for seg in s.segments if seg.trigger) == 101
