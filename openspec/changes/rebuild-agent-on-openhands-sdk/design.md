@@ -37,7 +37,7 @@
    | ERROR, 반복 상한 도달 | 상관없음 | `step_limit` |
    | ERROR, 그 외 / 예외 | 상관없음 | `error` |
 
-   반복 상한 도달 여부는 SDK가 남기는 오류 메시지 대신, 실행 뒤 이벤트 기록에서 LLM 응답 수가 상한과 같은지로 판단한다. 메시지 문구는 SDK 버전에 따라 바뀔 수 있기 때문이다.
+   반복 상한 도달 여부는 SDK가 남기는 `ConversationErrorEvent`의 `code == "MaxIterationsReached"`로 판단한다. 사람이 읽는 메시지 문구와 달리 코드는 식별자라 버전이 바뀌어도 덜 흔들린다. (처음에는 LLM 응답 수를 세려 했으나, 구현 중 SDK 소스에서 이 코드를 확인해 바꿨다.)
 5. **트리거 차단은 적재 단계에서.** `Segment`에서 `trigger`, `trigger_reason`, `co_triggered`를 뺀다. 검색 도구는 `trigger` 조건을 버리고 `max_avg_speed`, `min_density_slope`를 받는다. `level`은 perception 쪽 집계값이라 남긴다.
 6. **LLM 설정.** `LLM(model="anthropic/claude-opus-5-5", api_key=ANTHROPIC_API_KEY, num_retries=3)`. 모델은 `CONG_AGENT_MODEL`로 바꿀 수 있다. temperature는 지정하지 않는다. 첫 버전에 있던 서버 측 대체 모델(fallback) 설정은 LiteLLM 경유로 넘기는 방법을 확인하지 못해 이번에는 뺀다.
 7. **실행 기록.** `outputs/<시각>/` 아래 `persistence_dir`에 SDK가 이벤트를 저장하고, 실행 뒤 `run.json`을 우리가 쓴다. 토큰 사용량은 대화 통계(`conversation.conversation_stats`)에서 읽는다.
