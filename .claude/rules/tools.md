@@ -15,8 +15,9 @@ paths:
 
 ## 도구 폴더 구성
 
-- `impl.py`: 실행 로직은 순수 함수 `fn(session, **args) -> str`로 쓰고, Executor가 그것을 불러 Observation으로 바꾼다.
-- `definition.py`: Action(인자 스키마, pydantic), 도구 설명, ToolDefinition 하위 클래스와 `create(session=..., ...)`.
+- `impl.py`: 실행 로직을 순수 함수 `fn(session, **args) -> str`로 쓴다. SDK를 모른다.
+- `definition.py`: Action(인자 스키마, pydantic)과 도구 클래스. 조회 도구는 `QueryTool`을 상속해 `action_cls`, `tool_description`, `fn`만 채운다. 공용 `QueryExecutor`가 Action에서 도구가 선언한 인자만 꺼내 `fn`을 부르고 결과를 Observation으로 바꾼다.
+- `submit_judgment`는 판정을 저장해야 해서 자체 Executor(`impl.py`)와 `create(session=..., store=...)`를 가진다.
 - 도구 이름은 SDK가 클래스 이름에서 만든다(`ViewSegmentsTool` → `view_segments`). 폴더 이름과 같아야 한다.
 - 새 도구는 폴더를 만들고 `tools/__init__.py`의 `TOOL_CLASSES`에 넣는다.
 

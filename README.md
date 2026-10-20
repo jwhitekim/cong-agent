@@ -16,7 +16,7 @@ python3 -m venv .venv
 
 ## 실행
 
-`ANTHROPIC_API_KEY`가 필요합니다. 기본 모델은 `anthropic/claude-opus-5-5`(LiteLLM 형식)이고 `CONG_AGENT_MODEL`로 바꿀 수 있습니다.
+`ANTHROPIC_API_KEY`가 필요합니다. 모델·최대 단계·system prompt는 `config/default.yaml`에 있습니다. 기본 모델은 `anthropic/claude-opus-5-5`(LiteLLM 형식)이고, 환경변수 `CONG_AGENT_MODEL`로 바꿀 수 있습니다.
 
 ```bash
 .venv/bin/python -m cong_agent run \
@@ -24,8 +24,9 @@ python3 -m venv .venv
   --question "이 세션에서 혼잡이 가장 심했던 구간과 권고 수준은?"
 ```
 
-- `--max-steps`(기본 15): LLM 호출 횟수 상한입니다.
-- `--out`(기본 `outputs`): 실행마다 `outputs/<시각>/`이 생깁니다. `conversation/` 아래에는 SDK가 이벤트(LLM 응답, 도구 호출, 관측)를 하나씩 저장합니다. `run.json`에는 질문·모델·최종 상태·판정·토큰이 들어갑니다.
+- `--config`(기본 `config/default.yaml`): 실행 설정 파일입니다.
+- `--max-steps`: LLM 호출 횟수 상한입니다. 주면 설정 파일 값(15)을 덮어씁니다.
+- `--output-dir`(기본 `trajectories`): 실행마다 `trajectories/<시각>/`이 생깁니다. `conversation/` 아래에는 SDK가 이벤트(LLM 응답, 도구 호출, 관측)를 하나씩 저장합니다. `run.json`에는 질문·모델·최종 상태·판정·토큰이 들어갑니다.
 - 최종 상태는 다섯 가지입니다.
 
 | 상태 | 뜻 |
@@ -36,7 +37,7 @@ python3 -m venv .venv
 | `stuck` | 같은 호출·관측이 4번 반복돼 SDK가 멈춤 |
 | `error` | API 실패 등 |
 
-- 종료 코드는 `submitted`면 0, 다른 상태면 1, 세션을 읽지 못하면 2입니다.
+- 종료 코드는 `submitted`면 0, 다른 상태면 1, 세션이나 설정 파일을 읽지 못하면 2입니다.
 
 ## 도구 (에이전트-컴퓨터 인터페이스)
 
@@ -68,17 +69,18 @@ python3 -m venv .venv
 
 ## 구조
 
+OpenHands SDK·SWE-agent처럼 `src/` 없이 최상위에 패키지를 둡니다. 전체 구조와 규칙은 `.claude/rules/layout.md`에 있습니다.
+
 ```
-src/cong_agent/
-├── session.py        세션 폴더 → Segment 목록 (판정 입력·트리거 차단)
-├── tools/
-│   ├── query.py      조회 도구 4개 (순수 함수)
-│   ├── submit.py     판정 검증
-│   ├── format.py     출력 형식 규칙
-│   └── openhands.py  위 도구를 SDK ToolDefinition으로 감쌈
-├── prompt.py         system prompt
-├── runner.py         Agent·LLM·Conversation 구성, 최종 상태 판정, run.json
-└── __main__.py       CLI
+cong_agent/
+├── environment/session.py   세션 폴더 → Segment 목록 (판정 입력·트리거 차단)
+├── tools/<도구 이름>/        도구마다 definition.py(스키마·등록) + impl.py(실행 로직)
+├── tools/utils/             출력 형식, 입력 오류, 공용 도구 기반
+├── agent/                   LLM·Agent 구성, 최종 상태 판정
+└── run/run_single.py        설정·세션 적재 → 실행 → run.json, CLI
+config/default.yaml          모델, 최대 단계, system prompt
+tests/                       패키지 구조를 그대로 따라감
+trajectories/                실행 기록 (git 제외)
 ```
 
 ## 남은 일

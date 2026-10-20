@@ -1,0 +1,22 @@
+# 가상환경·캐시
+.venv/
+**/__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# 실행 기록·로컬 비밀
+trajectories/
+.env
+.env.*
+
+# 저장소·편집기 메타데이터
+.git/
+.gitignore
+.claude/
+.vscode/
+.idea/
+*.swp
+.DS_Store

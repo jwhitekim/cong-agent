@@ -10,7 +10,8 @@ cong-agent/
 │   │   └── session.py         세션 폴더 → Segment 목록 (숨길 필드 차단)
 │   ├── tools/
 │   │   ├── __init__.py        공개 목록: TOOL_CLASSES, register_tools
-│   │   ├── utils/             출력 형식(format.py), ToolError·번호 검사(errors.py), 공용 Observation
+│   │   ├── utils/             format.py(출력 형식), errors.py(ToolError·번호 검사),
+│   │   │                      base.py(공용 Observation·Executor·조회 도구 기반)
 │   │   ├── session_overview/  __init__.py, definition.py, impl.py
 │   │   ├── view_segments/
 │   │   ├── find_segments/
@@ -32,6 +33,8 @@ cong-agent/
 │   ├── agent/
 │   └── run/
 ├── trajectories/              실행 기록 (git 제외)
+├── .dockerignore
+├── .gitignore
 ├── pyproject.toml
 └── README.md
 ```
@@ -39,7 +42,7 @@ cong-agent/
 ## 규칙
 
 - 도구 하나 = `cong_agent/tools/` 아래 폴더 하나. 폴더 이름이 곧 LLM이 보는 도구 이름이다.
-- 각 도구 폴더는 `definition.py`(Action 스키마, 설명, ToolDefinition 클래스·`create`)와 `impl.py`(실행 로직·Executor)로 나눈다. 여러 도구가 쓰는 코드는 `tools/utils/`에 둔다.
+- 각 도구 폴더는 `definition.py`(Action 스키마, 설명, ToolDefinition 클래스·`create`)와 `impl.py`(실행 로직)로 나눈다. 조회 도구는 `tools/utils/base.py`의 공용 `QueryTool`·`QueryExecutor`를 쓰고, 자기 Executor가 필요한 도구(`submit_judgment`)만 `impl.py`에 둔다. 여러 도구가 쓰는 코드는 `tools/utils/`에 둔다.
 - 테스트는 패키지 경로를 따라간다. `cong_agent/tools/view_segments/`의 테스트는 `tests/tools/view_segments/`에 둔다.
 - 실행 기록은 `trajectories/<시각>/`에 쓴다. 다른 곳(`outputs/` 등)에 쓰지 않는다.
 - 프롬프트·모델·최대 단계 같은 실행 설정은 코드가 아니라 `config/*.yaml`에 둔다.
