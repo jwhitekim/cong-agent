@@ -2,8 +2,8 @@
 
 ## 1. 준비
 
-- [ ] 1.1 현재 첫 버전 코드와 OpenSpec 파일을 git 첫 커밋으로 남기고 `git log --oneline`에 커밋 1개가 보이는지 확인
-- [ ] 1.2 `add-congestion-agent-mvp`를 아카이브하고(남은 실제 실행 작업은 이 변경 5.3으로 이월) `openspec/specs/congestion-aci/spec.md`, `openspec/specs/agent-loop/spec.md`가 생기는지 확인
+- [x] 1.1 현재 첫 버전 코드와 OpenSpec 파일을 git 커밋으로 남기고 `git log --oneline`에 커밋이 보이는지 확인
+- [x] 1.2 `add-congestion-agent-mvp`를 아카이브하고(남은 실제 실행 작업은 이 변경 5.3으로 이월) `openspec/specs/congestion-aci/spec.md`, `openspec/specs/agent-loop/spec.md`가 생기는지 확인
 - [ ] 1.3 `pyproject.toml` 의존성을 `openhands-sdk==1.56.0`으로 바꾸고 `anthropic`을 빼서 재설치한 뒤 `python -c "import openhands.sdk"`가 성공하는지 확인
 
 ## 2. 트리거 제거
@@ -11,7 +11,7 @@
 - [ ] 2.1 `session.py`의 `Segment`에서 `trigger`, `trigger_reason`, `co_triggered`를 빼고, 필드 목록 테스트에 세 이름을 추가해 통과 확인
 - [ ] 2.2 `session_overview`에서 트리거 개수를 빼고 `level`별 개수 합·인원·평균 속도 범위를 보이게 바꾼 뒤 개요 테스트 통과 확인
 - [ ] 2.3 `view_segments`에서 트리거 열과 트리거 근거를 빼고, fixture 전체 조회 출력에 트리거 이름·근거 문장이 없음을 확인하는 테스트 추가
-- [ ] 2.4 `find_segments`에서 `trigger` 조건을 빼고 `max_avg_speed`, `min_density_slope`를 추가해 느린 구간 검색·조건 결합·일치 0개·조건 없음 오류를 테스트로 확인
+- [ ] 2.4 `find_segments`에서 `trigger` 조건을 빼고 `max_avg_speed`, `min_density_slope`를 추가해 느린 구간 검색·조건 결합·일치 0개·조건 없음 오류·`trigger` 인자 거부를 테스트로 확인
 
 ## 3. OpenHands 도구 감싸기
 
