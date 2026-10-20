@@ -11,6 +11,7 @@
 trajectories/
 .env
 .env.*
+!.env.example
 
 # 저장소·편집기 메타데이터
 .git/

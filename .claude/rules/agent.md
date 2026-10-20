@@ -17,7 +17,7 @@ paths:
 ## 루프는 SDK에 맡긴다
 
 - 루프·LLM 재시도·이벤트 저장·반복 감지는 직접 만들지 않는다. 우리 코드는 구성(`agent/agent.py`), 최종 상태 판정(`agent/status.py`), 실행과 `run.json` 쓰기(`run/run_single.py`)만 한다.
-- `LLM(model=..., num_retries=3)`. 현재 모델은 temperature를 받지 않으므로 지정하지 않는다. API 키는 `ANTHROPIC_API_KEY`에서 읽는다.
+- `LLM(model=..., num_retries=3)`. 현재 모델은 temperature를 받지 않으므로 지정하지 않는다. API 키는 `ANTHROPIC_API_KEY`에서 읽는다. CLI는 저장소 루트의 `.env`를 읽되, 셸에 이미 있는 값을 덮어쓰지 않는다. `.env`는 git에 올리지 않고, 키 이름은 `.env.example`에 둔다.
 - Agent의 기본 도구는 `FinishTool`, `ThinkTool`만 켠다.
 
 ## 설정 (`config/default.yaml`)

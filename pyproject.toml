@@ -7,7 +7,7 @@ name = "cong-agent"
 version = "0.1.0"
 description = "혼잡도 세션 관측값을 도구로 조회해 판정하는 OpenHands SDK 기반 LLM 에이전트"
 requires-python = ">=3.12"
-dependencies = ["openhands-sdk==1.56.0", "pyyaml>=6"]
+dependencies = ["openhands-sdk==1.56.0", "pyyaml>=6", "python-dotenv>=1"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]

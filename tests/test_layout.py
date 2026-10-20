@@ -24,6 +24,7 @@ REQUIRED = [
     "tests/environment",
     "tests/agent",
     "tests/run",
+    ".env.example",
     ".dockerignore",
     ".gitignore",
     "pyproject.toml",
@@ -68,4 +69,9 @@ def test_layout_rule_lists_every_tool_folder():
 
 def test_trajectories_ignored_by_git():
     out = subprocess.run(["git", "check-ignore", "trajectories/x"], cwd=REPO_ROOT, capture_output=True)
+    assert out.returncode == 0
+
+
+def test_env_file_ignored_by_git():
+    out = subprocess.run(["git", "check-ignore", ".env"], cwd=REPO_ROOT, capture_output=True)
     assert out.returncode == 0

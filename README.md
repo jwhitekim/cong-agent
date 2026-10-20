@@ -16,7 +16,7 @@ python3 -m venv .venv
 
 ## 실행
 
-`ANTHROPIC_API_KEY`가 필요합니다. 모델·최대 단계·system prompt는 `config/default.yaml`에 있습니다. 기본 모델은 `anthropic/claude-opus-5-5`(LiteLLM 형식)이고, 환경변수 `CONG_AGENT_MODEL`로 바꿀 수 있습니다.
+`ANTHROPIC_API_KEY`가 필요합니다. 저장소 루트의 `.env`에 적으면 CLI가 읽습니다(`.env.example` 참고). 모델·최대 단계·system prompt는 `config/default.yaml`에 있습니다. 기본 모델은 `anthropic/claude-opus-5-5`(LiteLLM 형식)이고, 환경변수 `CONG_AGENT_MODEL`로 바꿀 수 있습니다.
 
 ```bash
 .venv/bin/python -m cong_agent run \

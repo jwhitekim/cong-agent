@@ -33,6 +33,7 @@ cong-agent/
 │   ├── agent/
 │   └── run/
 ├── trajectories/              실행 기록 (git 제외)
+├── .env.example           환경변수 이름 (.env는 git 제외)
 ├── .dockerignore
 ├── .gitignore
 ├── pyproject.toml
