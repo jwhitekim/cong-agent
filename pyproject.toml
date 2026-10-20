@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cong-agent"
+version = "0.1.0"
+description = "혼잡도 세션 관측값을 도구로 조회해 판정하는 LLM 에이전트 (MVP)"
+requires-python = ">=3.11"
+dependencies = ["anthropic>=0.40"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["tests"]
