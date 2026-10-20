@@ -80,3 +80,9 @@ src/cong_agent/
 ├── runner.py         Agent·LLM·Conversation 구성, 최종 상태 판정, run.json
 └── __main__.py       CLI
 ```
+
+## 남은 일
+
+- 실제 API로 한 번 실행해 보기: 실제 세션에 질문 하나를 돌려 `submitted` 상태와 2단계 이상 진행을 확인하고, 단계 수·토큰을 여기에 기록한다.
+
+개발 규칙은 `.claude/rules/`에 있습니다.
