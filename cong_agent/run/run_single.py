@@ -46,7 +46,7 @@ def load_config(path: str | Path = DEFAULT_CONFIG, *, model: str | None = None,
     except (OSError, yaml.YAMLError, KeyError, TypeError, ValueError) as e:
         raise ConfigError(f"설정 파일을 읽을 수 없습니다 ({path}): {type(e).__name__}: {e}") from e
     cfg.model = model or os.environ.get("CONG_AGENT_MODEL") or cfg.model
-    cfg.max_steps = max_steps or cfg.max_steps
+    cfg.max_steps = cfg.max_steps if max_steps is None else max_steps
     return cfg
 
 
@@ -77,11 +77,18 @@ def run(session: Session, question: str, llm: LLM, config: RunConfig, run_dir: s
     return result
 
 
+def _positive_int(value: str) -> int:
+    number = int(value)
+    if number < 1:
+        raise argparse.ArgumentTypeError("1 이상의 정수여야 합니다")
+    return number
+
+
 def add_arguments(p: argparse.ArgumentParser) -> None:
     p.add_argument("--session", required=True, help="session.json과 results.jsonl이 있는 폴더")
     p.add_argument("--question", required=True)
     p.add_argument("--config", default=str(DEFAULT_CONFIG))
-    p.add_argument("--max-steps", type=int, default=None, help="설정 파일 값을 덮어씀")
+    p.add_argument("--max-steps", type=_positive_int, default=None, help="설정 파일 값을 덮어씀")
     p.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR), help="실행 기록을 둘 상위 폴더")
 
 

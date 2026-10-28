@@ -1,10 +1,11 @@
+import argparse
 import json
 
 import pytest
 from openhands.sdk.testing import TestLLM
 
 from cong_agent.__main__ import main
-from cong_agent.run.run_single import ConfigError, load_config, run
+from cong_agent.run.run_single import ConfigError, add_arguments, load_config, run
 from conftest import FINISH, FIXTURE, GOOD, call, events, run_json
 
 
@@ -19,6 +20,8 @@ def test_config_overrides(monkeypatch, config):
     assert load_config(config.path).model == "anthropic/env-model"
     assert load_config(config.path, model="x/arg", max_steps=3).model == "x/arg"
     assert load_config(config.path, max_steps=3).max_steps == 3
+    assert load_config(config.path, max_steps=None).max_steps == config.max_steps
+    assert load_config(config.path, max_steps=0).max_steps == 0
 
 
 def test_bad_config(tmp_path):
@@ -104,6 +107,26 @@ def test_no_image_content_sent(session, config, tmp_path):
 
 
 # --- CLI ---
+
+@pytest.mark.parametrize("value", ["0", "-1", "1.5", "abc"])
+def test_cli_rejects_invalid_max_steps(value, capsys):
+    parser = argparse.ArgumentParser()
+    add_arguments(parser)
+    with pytest.raises(SystemExit) as exc:
+        parser.parse_args(["--session", str(FIXTURE), "--question", "q", "--max-steps", value])
+    assert exc.value.code == 2
+    assert "--max-steps" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("value", [None, "1", "3"])
+def test_cli_accepts_max_steps(value):
+    parser = argparse.ArgumentParser()
+    add_arguments(parser)
+    argv = ["--session", str(FIXTURE), "--question", "q"]
+    if value is not None:
+        argv.extend(["--max-steps", value])
+    assert parser.parse_args(argv).max_steps == (None if value is None else int(value))
+
 
 def test_cli_prints_judgment(tmp_path, capsys):
     llm = TestLLM.from_messages([call("submit_judgment", GOOD), FINISH])
