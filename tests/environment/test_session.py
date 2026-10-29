@@ -35,6 +35,25 @@ def test_broken_line_reports_line_number(tmp_path):
         load_session(tmp_path)
 
 
+def test_metadata_defaults(tmp_path):
+    (tmp_path / "session.json").write_text("{}", encoding="utf-8")
+    shutil.copy(FIXTURE / "results.jsonl", tmp_path)
+    s = load_session(tmp_path)
+    assert s.session_id == tmp_path.name
+    assert s.segment_interval == 5.0
+
+
+def test_blank_lines_skipped_and_empty_session_rejected(tmp_path):
+    shutil.copy(FIXTURE / "session.json", tmp_path)
+    lines = (FIXTURE / "results.jsonl").read_text(encoding="utf-8").splitlines()
+    (tmp_path / "results.jsonl").write_text("\n\n".join(lines[:3]) + "\n\n", encoding="utf-8")
+    assert [seg.index for seg in load_session(tmp_path).segments] == [0, 1, 2]
+
+    (tmp_path / "results.jsonl").write_text("\n  \n", encoding="utf-8")
+    with pytest.raises(SessionError, match="세그먼트가 없습니다"):
+        load_session(tmp_path)
+
+
 @pytest.mark.skipif(not REAL_SESSION.is_dir(), reason="실제 세션 폴더 없음")
 def test_real_session():
     s = load_session(REAL_SESSION)

@@ -1,10 +1,12 @@
 import argparse
 import json
+import os
 
 import pytest
 from openhands.sdk.testing import TestLLM
 
 from cong_agent.__main__ import main
+from cong_agent.run import run_single
 from cong_agent.run.run_single import ConfigError, add_arguments, load_config, run
 from conftest import FINISH, FIXTURE, GOOD, call, events, run_json
 
@@ -143,3 +145,22 @@ def test_cli_input_errors_exit_2(tmp_path, capsys):
     assert "session.json" in capsys.readouterr().err
     assert main(["run", "--session", str(FIXTURE), "--question", "q", "--config", str(tmp_path / "x.yaml"),
                  "--output-dir", str(tmp_path)], llm=TestLLM.from_messages([])) == 2
+
+
+def test_cli_non_submitted_exits_1(tmp_path, capsys):
+    code = main(["run", "--session", str(FIXTURE), "--question", "q", "--output-dir", str(tmp_path)],
+                llm=TestLLM.from_messages([FINISH]))
+    assert code == 1 and "상태: no_judgment" in capsys.readouterr().out
+    (rec,) = tmp_path.glob("*/run.json")
+    assert json.loads(rec.read_text(encoding="utf-8"))["status"] == "no_judgment"
+
+
+def test_cli_dotenv_keeps_shell_values(tmp_path, monkeypatch):
+    (tmp_path / ".env").write_text("CONG_TEST_SHELL=from-dotenv\nCONG_TEST_NEW=from-dotenv\n", encoding="utf-8")
+    monkeypatch.setattr(run_single, "REPO_ROOT", tmp_path)
+    monkeypatch.setenv("CONG_TEST_SHELL", "from-shell")
+    monkeypatch.delenv("CONG_TEST_NEW", raising=False)  # 끝나면 다시 지운다
+    # 세션 폴더가 비어 있어 입력 오류(2)로 바로 끝난다. .env는 그 전에 읽힌다.
+    assert main(["run", "--session", str(tmp_path), "--question", "q"], llm=TestLLM.from_messages([])) == 2
+    assert os.environ["CONG_TEST_SHELL"] == "from-shell"
+    assert os.environ["CONG_TEST_NEW"] == "from-dotenv"
