@@ -1,14 +1,14 @@
 # 전체 구현 체크리스트
 
-capability 의존 순서로 정리한다. `[x]`는 구현과 기존 테스트가 있는 항목이다. `[ ]`는 구현은 확인했지만 해당 동작의 직접 테스트 보완이 남은 항목이다. 테스트 파일 표기는 관련 검증의 위치이며, 요구사항의 모든 경계 사례를 검사한다는 뜻은 아니다.
+capability 의존 순서로 정리한다. `[x]`는 구현과 테스트가 있는 항목, `[ ]`는 남은 항목이다. 테스트 파일 표기는 관련 검증의 위치이며, 요구사항의 모든 경계 사례를 검사한다는 뜻은 아니다.
 
 ## 1. session-loading
 
 - [x] 세션 폴더 적재와 연속 번호·구역 목록 제공 (근거: Session Folder Loading) — `tests/environment/test_session.py`
 - [x] 세그먼트에서 판정·원시 데이터·트리거 필드 차단 (근거: Session Field Isolation) — `tests/environment/test_session.py`
-- [ ] 식별자·간격 누락 시 기본값 적용 (근거: Session Metadata Defaults) — 구현됨, 기본값 직접 테스트 없음.
+- [x] 식별자·간격 누락 시 기본값 적용 (근거: Session Metadata Defaults) — `tests/environment/test_session.py`
 - [x] 필수 파일 누락과 결과 행 오류 보고 (근거: Session Input Error Reporting) — `tests/environment/test_session.py`
-- [ ] 빈 줄 건너뛰기와 빈 세션 거부 (근거: Empty Session Rejection) — 구현됨, 직접 테스트 없음.
+- [x] 빈 줄 건너뛰기와 빈 세션 거부 (근거: Empty Session Rejection) — `tests/environment/test_session.py`
 
 ## 2. query-tools
 
@@ -34,7 +34,7 @@ capability 의존 순서로 정리한다. `[x]`는 구현과 기존 테스트가
 
 - [x] Agent 도구를 조회 4개·제출·finish·think로 제한 (근거: Agent Tool Boundary) — `tests/agent/test_agent.py`
 - [x] 설정 프롬프트 적용과 기본 도구 안내·트리거 비언급 (근거: Agent Prompt Configuration) — `tests/agent/test_agent.py`
-- [ ] 모델·API 키·재시도·usage_id로 LLM 구성 (근거: Agent Llm Configuration) — 구현됨, 구성기 직접 테스트 없음.
+- [x] 모델·API 키·재시도·usage_id로 LLM 구성 (근거: Agent Llm Configuration) — `tests/agent/test_agent.py`
 - [x] 모델과 최대 단계의 설정 우선순위 적용 (근거: Run Configuration Precedence) — `tests/run/test_run_single.py`
 - [x] 세션·설정 오류를 실행 전에 보고 (근거: Run Input Error Handling) — `tests/run/test_run_single.py`
 - [x] 최종 상태 5종 판정 (근거: Run Final State Classification) — `tests/run/test_run_single.py`
@@ -42,5 +42,5 @@ capability 의존 순서로 정리한다. `[x]`는 구현과 기존 테스트가
 - [x] LLM에 이미지 없이 텍스트 전달 (근거: Run Text Only Input) — `tests/run/test_run_single.py`
 - [x] SDK 이벤트와 실행 요약 보존 (근거: Run Record Persistence) — `tests/run/test_run_single.py`
 - [x] CLI 필수·선택 인자와 출력 폴더 처리 (근거: Run Cli Interface) — `tests/run/test_run_single.py`
-- [ ] CLI 상태·판정·오류·종료 코드 출력 검증 보완 (근거: Run Cli Result Reporting) — 구현됨, `tests/run/test_run_single.py`에 성공 코드 0은 있으나 실행 상태별 코드 1 직접 테스트 없음.
-- [ ] .env 적재 시 셸 환경변수 우선 유지 (근거: Run Environment Loading) — 구현됨, 직접 테스트 없음.
+- [x] CLI 상태·판정·종료 코드 출력 (근거: Run Cli Result Reporting) — `tests/run/test_run_single.py`
+- [x] .env 적재 시 셸 환경변수 우선 유지 (근거: Run Environment Loading) — `tests/run/test_run_single.py`
