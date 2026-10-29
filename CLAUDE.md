@@ -1,3 +1,4 @@
+문서 배치는 docs/docs-rules.md를 따른다.
 
 <!-- commit-and-push:auto-commit-rule:begin -->
 ## 커밋 자동화

@@ -24,6 +24,9 @@ cong-agent/
 │       └── run_single.py      설정·세션 적재 → Conversation 실행 → run.json, CLI
 ├── config/
 │   └── default.yaml           모델, 최대 단계, system prompt
+├── docs/                      SDD 문서 (배치 규칙: docs/docs-rules.md)
+│   ├── contract.md, proposal.md, design.md, tasks.md
+│   └── specs/<capability>/spec.md
 ├── tests/                     패키지 구조를 그대로 따라간다
 │   ├── conftest.py
 │   ├── fixtures/session_small/
